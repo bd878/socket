@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sstream>
+#include <cerrno>
 #include <cstring>
 #include <stdexcept>
 #include <iostream>
@@ -25,13 +26,18 @@ int main(int argc, char **argv) {
   //   throw runtime_error("usage: a.out <IPaddress>");
   // }
 
+  // if ((sock = socket(9999, SOCK_STREAM, 0)) < 0) {
+  //   cout << "socket() failed: " << strerror(errno) << '\n';
+  //   exit(1);
+  // }
+
   if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
     throw runtime_error("socket error");
   }
 
   memset(&serveaddr, 0, sizeof(serveaddr));
   serveaddr.sin_family = AF_INET;
-  serveaddr.sin_port = htons(13);
+  serveaddr.sin_port = htons(9999);
   serveaddr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
   // if (inet_pton(AF_INET, argv[1], &serveaddr.sin_addr) <= 0) {
   //   stringstream ss;
@@ -50,12 +56,19 @@ int main(int argc, char **argv) {
   // if (fputs(recvline, stdout) == EOF) {
   //   throw runtime_error("fputs error");
   // }
+  int success_read_count = 0;
   while ((n = read(sock, recvline, BUF_LEN)) > 0) {
+    success_read_count += 1;
+
     recvline[n] = 0;
     if (fputs(recvline, stdout) == EOF) {
-      throw runtime_error("fputs error");
+      cout << strerror(errno) << '\n';
+      exit(2);
     }
   }
+
+  cout << '\n';
+  cout << "Successive reads: " << success_read_count << '\n';
 
   if (n < 0) {
     throw runtime_error("read error");

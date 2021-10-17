@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <cstring>
+#include <algorithm>
 #include <iostream>
 
 using namespace std;
@@ -25,7 +26,7 @@ int main(int argc, char **argv) {
   }
 
   addr.sin_family = AF_INET;
-  addr.sin_port = htons(13);
+  addr.sin_port = htons(9999);
   addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
   if (bind(listener, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
@@ -41,8 +42,10 @@ int main(int argc, char **argv) {
     cout << "Connection received!" << '\n';
 
     ticks = time(NULL);
-    snprintf(buff, sizeof(buff), "%.24s\er\en", ctime(&ticks));
-    send(sock, buff, strlen(buff), 0);
+    int written = snprintf(buff, sizeof(buff), "%.24s\er\en", ctime(&ticks));
+    for_each_n(buff, written, [sock](char c){
+      write(sock, &c, sizeof(c));
+    });
 
     close(sock);
     cout << "Connection closed" << '\n';
