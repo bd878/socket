@@ -34,7 +34,7 @@ int inet_pton_ipv4(int sock_family, const char *strptr, void *addrptr) {
 const char* inet_ntop_ipv4(int family, const void *addrptr, char *strptr, size_t len) {
   const u_char *p = (const u_char *)addrptr;
 
-  if (family == AF_INET) {
+  if (family == AF_INET) { // TODO: AF_INET6, AF_UNIX, AF_LINK
     char temp[16];
 
     snprintf(temp, sizeof(temp), "%d.%d.%d.%d", p[0], p[1], p[2], p[3]);
@@ -47,6 +47,28 @@ const char* inet_ntop_ipv4(int family, const void *addrptr, char *strptr, size_t
     return strptr;
   }
   cout << "No support" << '\n';
+  errno = EAFNOSUPPORT;
+  return NULL;
+}
+
+char *sock_ntop(const struct sockaddr *sa, socklen_t salen) {
+  char portstr[7];
+  static char str[128]; // not thread safe
+
+  switch (sa->sa_family) {
+    case AF_INET: {
+      struct sockaddr_in *sin = (struct sockaddr_in *) sa;
+
+      if (inet_ntop_ipv4(AF_INET, &sin->sin_addr, str, sizeof(str)) == NULL) {
+        return NULL;
+      }
+      if (ntohs(sin->sin_port) != 0) {
+        snprintf(portstr, sizeof(portstr), ".%d", ntohs(sin->sin_port));
+        strcat(str, portstr);
+      }
+    }
+    return str;
+  }
   errno = EAFNOSUPPORT;
   return NULL;
 }
@@ -74,9 +96,17 @@ int main() {
   cout << "p_addr p_addr end addr: " << (&p_addr + sizeof(p_addr)) << '\n';
   cout << "n_addr n_addr addr: " << &n_addr << '\n';
   cout << "converted_addr addr: " << &converted_addr << '\n';
-
   cout << "sizeof(converted_addr): " << sizeof(converted_addr) << '\n';
-  if (inet_ntop_ipv4(AF_INET, n_addr, converted_addr, sizeof(converted_addr)) != NULL) {
+
+  struct sockaddr_in serv;
+
+  // or memset(&serv, 0, sizeof(serv));
+  serv.sin_family = AF_INET;
+  serv.sin_port = htons(9999);
+  serv.sin_addr.s_addr = htons();
+  memset(&serv.sin_zero, 0, sizeof(serv.sin_zero));
+
+  if (sock_ntop((struct sockaddr *)&serv, sizeof(serv)) != NULL) {
     cout << "Converted address: " << converted_addr << '\n';
   } else {
     cout << "Failed to convert address back" << '\n';
