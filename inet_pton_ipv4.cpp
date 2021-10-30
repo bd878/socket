@@ -34,7 +34,7 @@ int inet_pton_ipv4(int sock_family, const char *strptr, void *addrptr) {
 const char* inet_ntop_ipv4(int family, const void *addrptr, char *strptr, size_t len) {
   const u_char *p = (const u_char *)addrptr;
 
-  if (family == AF_INET) { // TODO: AF_INET6, AF_UNIX, AF_LINK
+  if (family == AF_INET) {
     char temp[16];
 
     snprintf(temp, sizeof(temp), "%d.%d.%d.%d", p[0], p[1], p[2], p[3]);
@@ -56,7 +56,7 @@ char *sock_ntop(const struct sockaddr *sa, socklen_t salen) {
   static char str[128]; // not thread safe
 
   switch (sa->sa_family) {
-    case AF_INET: {
+    case AF_INET: {  // TODO: AF_INET6, AF_UNIX, AF_LINK
       struct sockaddr_in *sin = (struct sockaddr_in *) sa;
 
       if (inet_ntop_ipv4(AF_INET, &sin->sin_addr, str, sizeof(str)) == NULL) {
@@ -71,6 +71,19 @@ char *sock_ntop(const struct sockaddr *sa, socklen_t salen) {
   }
   errno = EAFNOSUPPORT;
   return NULL;
+}
+
+int inet_pton_loose(int family, const char* strptr, void *addrptr) {
+  if (family == AF_INET || family == AF_INET6) {
+    int pton_inet = inet_pton(family, strptr, addrptr);
+    if (pton_inet == 0) {
+      return inet_aton();
+    } else {
+      return pton_inet;
+    }
+  }
+
+  return -1;
 }
 
 int main() {

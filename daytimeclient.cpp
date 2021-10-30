@@ -22,9 +22,9 @@ int main(int argc, char **argv) {
   char recvline[BUF_LEN + 1];
   struct sockaddr_in serveaddr;
 
-  // if (argc != 2) {
-  //   throw runtime_error("usage: a.out <IPaddress>");
-  // }
+  if (argc != 2) {
+    throw runtime_error("usage: a.out <IPaddress>");
+  }
 
   // if ((sock = socket(9999, SOCK_STREAM, 0)) < 0) {
   //   cout << "socket() failed: " << strerror(errno) << '\n';
@@ -32,24 +32,24 @@ int main(int argc, char **argv) {
   // }
 
   if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-    throw runtime_error("socket error");
+    exit(1);
   }
 
   memset(&serveaddr, 0, sizeof(serveaddr));
   serveaddr.sin_family = AF_INET;
-  serveaddr.sin_port = htons(9999);
-  serveaddr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
-  // if (inet_pton(AF_INET, argv[1], &serveaddr.sin_addr) <= 0) {
-  //   stringstream ss;
-  //   ss << "inet_pton error for " << argv[1] << '\n';
-  //   throw runtime_error(ss.str());
-  // }
+  serveaddr.sin_port = htons(13);
+  // serveaddr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+  if (inet_pton(AF_INET, argv[1], &serveaddr.sin_addr) <= 0) {
+    printf("inet_pton error for %s\n", argv[1]);
+    exit(1);
+  }
 
-  cout << "connecting..." << '\n';
+  printf("connecting...\n");
   if (connect(sock, (struct sockaddr*)&serveaddr, sizeof(serveaddr)) > 0) {
+    // ECONNREFUSED, EINTR, ETIMEDOUT, rst handshake packet
     throw runtime_error("connect error");
   }
-  cout << "connected" << '\n';
+  printf("connected\n");
 
   // n = recv(sock, recvline, sizeof(BUF_LEN), 0);
   // recvline[n] = 0;
@@ -62,13 +62,13 @@ int main(int argc, char **argv) {
 
     recvline[n] = 0;
     if (fputs(recvline, stdout) == EOF) {
-      cout << strerror(errno) << '\n';
+      printf("%s\n", strerror(errno));
       exit(2);
     }
   }
 
-  cout << '\n';
-  cout << "Successive reads: " << success_read_count << '\n';
+  printf("\n");
+  printf("Successive reads %d\n", success_read_count);
 
   if (n < 0) {
     throw runtime_error("read error");
