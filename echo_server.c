@@ -1,12 +1,10 @@
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <arpa/inet.h>
 #include <netinet/in.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <iostream>
-
-using namespace std;
 
 int main() {
   int sock, listener;
@@ -21,18 +19,23 @@ int main() {
   }
 
   addr.sin_family = AF_INET;
-  addr.sin_port = htons(3425);
-  addr.sin_addr.s_addr = htonl(INADDR_ANY);
+  addr.sin_port = htons(13);
+  addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
   if (bind(listener, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
     perror("bind");
     exit(2);
   }
 
   listen(listener, 1);
+  char buff[128];
+  printf("listening on %s, port %d\n",
+    inet_ntop(AF_INET, &addr.sin_addr, buff, sizeof(buff)),
+    ntohs(addr.sin_port));
 
   while(1) {
+    printf("waiting for connections...\n");
     sock = accept(listener, NULL, NULL);
-    cout << "received new connection" << '\n';
+    printf("received new connection\n");
     if (sock < 0) {
       perror("accept");
       exit(3);
@@ -41,7 +44,7 @@ int main() {
     while (1) {
       bytes_read = recv(sock, buf, 1024, 0);
       if (bytes_read <= 0) break;
-      cout << "Received: " << buf << '\n';
+      printf("received %s\n", buf);
       send(sock, buf, bytes_read, 0);
     }
 
