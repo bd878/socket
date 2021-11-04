@@ -4,6 +4,7 @@
 #include <netinet/in.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include <time.h>
 
@@ -34,8 +35,25 @@ int main(int argc, char **argv) {
 
   printf("Waiting for connections...\n");
   while (1) {
-    sock = accept(listener, NULL, NULL);
-    printf("Connection received!\n");
+    struct sockaddr_in caddr;
+    socklen_t clen = sizeof(caddr);
+    char cbuff[128];
+    sock = accept(listener, (struct sockaddr *)&caddr, &clen);
+    printf("Connection received on %s:%d\n",
+      inet_ntop(AF_INET, &caddr.sin_addr, cbuff, sizeof(cbuff)),
+      ntohs(caddr.sin_port));
+
+    struct sockaddr_in peercaddr;
+    socklen_t peerclen = sizeof(peercaddr);
+    char peercbuff[128];
+    if (getpeername(sock, (struct sockaddr *)&peercaddr, &peerclen) == -1) {
+      perror("getpeername");
+      exit(3);
+    }
+    /* peer connection == accept connection */
+    printf("Peer connection is %s:%d\n",
+      inet_ntop(AF_INET, &peercaddr.sin_addr, peercbuff, sizeof(peercbuff)),
+      ntohs(peercaddr.sin_port));
 
     ticks = time(NULL);
     int written = snprintf(buff, sizeof(buff), "%.24s\er\en", ctime(&ticks));

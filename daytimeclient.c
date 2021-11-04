@@ -29,12 +29,13 @@ main(int argc, char **argv) {
   // }
 
   if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+    perror("sock");
     exit(1);
   }
 
   memset(&serveaddr, 0, sizeof(serveaddr));
   serveaddr.sin_family = AF_INET;
-  serveaddr.sin_port = htons(13);
+  serveaddr.sin_port = htons(9999);
   // serveaddr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
   if (inet_pton(AF_INET, argv[1], &serveaddr.sin_addr) <= 0) {
     printf("inet_pton error for %s\n", argv[1]);
@@ -47,7 +48,18 @@ main(int argc, char **argv) {
     perror("connect");
     exit(2);
   }
-  printf("connected\n");
+
+  struct sockaddr_storage ss;
+  socklen_t len = sizeof(ss);
+  if (getsockname(sock, (struct sockaddr *)&ss, &len) == -1) {
+    perror("getsockname");
+    exit(4);
+  }
+
+  char buf[128];
+  printf("connected on %s:%d\n", /* sockaddr_storage -> sockaddr_in may be? */
+    inet_ntop(AF_INET, &((struct sockaddr_in *)&ss)->sin_addr, buf, sizeof(buf)),
+    ntohs(((struct sockaddr_in *)&ss)->sin_port));
 
   // n = recv(sock, recvline, sizeof(BUF_LEN), 0);
   // recvline[n] = 0;
