@@ -6,11 +6,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <cstring>
-#include <algorithm>
-#include <iostream>
-
-using namespace std;
 
 int BUF_LEN = 1000;
 
@@ -22,7 +17,8 @@ int main(int argc, char **argv) {
 
   listener = socket(AF_INET, SOCK_STREAM, 0);
   if (listener < 0) {
-    throw runtime_error("cannot listen");
+    perror("listen");
+    exit(1);
   }
 
   addr.sin_family = AF_INET;
@@ -36,19 +32,19 @@ int main(int argc, char **argv) {
 
   listen(listener, 1);
 
-  cout << "Waiting for connections..." << '\n';
+  printf("Waiting for connections...\n");
   while (1) {
     sock = accept(listener, NULL, NULL);
-    cout << "Connection received!" << '\n';
+    printf("Connection received!\n");
 
     ticks = time(NULL);
     int written = snprintf(buff, sizeof(buff), "%.24s\er\en", ctime(&ticks));
-    for_each_n(buff, written, [sock](char c){
-      write(sock, &c, sizeof(c));
-    });
+    for (int i = 0; i < written; ++i) {
+      write(sock, &buff[i], sizeof(char));
+    }
 
     close(sock);
-    cout << "Connection closed" << '\n';
+    printf("Connection closed\n");
   }
 
   return 0;
