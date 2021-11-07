@@ -15,8 +15,12 @@ int Socket(int, int, int);
 void Bind(int, const struct sockaddr *, size_t);
 void Listen(int, int);
 int Accept(int, struct sockaddr *, socklen_t *);
+void Connect(int, struct sockaddr *, socklen_t);
 pid_t Fork();
 void Close(int);
 void Writen(int, const void *, size_t);
+ssize_t Readline(int, void *, size_t);
+char *Fgets(char *, int, FILE *);
+void Inet_pton(int, const char *, struct sockaddr *);
 
 #endif

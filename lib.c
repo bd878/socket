@@ -38,6 +38,14 @@ Accept(int fd, struct sockaddr *addr, socklen_t *len) {
   return ret;
 }
 
+void
+Connect(int fd, const struct sockaddr *addr, socklen_t len) {
+  if (connect(fd, addr, len) == -1) {
+    perror("connect");
+    exit(1);
+  }
+}
+
 pid_t
 Fork() {
   pid_t p;
@@ -53,6 +61,14 @@ void
 Close(int fd) {
   if (close(fd) == -1) {
     perror("close");
+    exit(1);
+  }
+}
+
+void
+Inet_pton(int family, const char *str, struct sockaddr *addr) {
+  if (inet_pton(family, str, addr) == -1) {
+    perror("inet_pton");
     exit(1);
   }
 }
@@ -86,4 +102,15 @@ Writen(int fd, const void *line, size_t n) {
     perror("writen");
     exit(1);
   }
+}
+
+char *
+Fgets(char *str, int n, FILE *stream) {
+  char *vptr;
+
+  if ((vptr = fgets(str, n, stream)) == NULL && ferror(stream)) {
+    perror("fgets");
+    exit(1);
+  }
+  return vptr;
 }
