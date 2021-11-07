@@ -66,7 +66,7 @@ Close(int fd) {
 }
 
 void
-Inet_pton(int family, const char *str, struct sockaddr *addr) {
+Inet_pton(int family, const char *str, void *addr) {
   if (inet_pton(family, str, addr) == -1) {
     perror("inet_pton");
     exit(1);
@@ -113,4 +113,12 @@ Fgets(char *str, int n, FILE *stream) {
     exit(1);
   }
   return vptr;
+}
+
+void
+Fputs(const char *str, FILE *stream) {
+  if (fputs(str, stream) == EOF) {
+    perror("fputs");
+    exit(1);
+  }
 }
