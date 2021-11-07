@@ -4,7 +4,7 @@ int
 Socket(int family, int type, int protocol) {
   int ret;
 
-  if (ret = (socket(family, type, protocol)) < 0) {
+  if ((ret = socket(family, type, protocol)) < 0) {
     perror("socket");
     exit(1);
   }
