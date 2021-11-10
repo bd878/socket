@@ -17,6 +17,15 @@ str_echo(int fd) {
   }
 }
 
+void
+sig_chld(int signo) {
+  pid_t pid;
+  int stat;
+
+  pid = wait(&stat);
+  printf("child terminated %d\n", pid);
+}
+
 int
 main(int argc, char **argv) {
   int listenfd, cfd;
@@ -33,6 +42,7 @@ main(int argc, char **argv) {
 
   Bind(listenfd, (struct sockaddr *)&saddr, sizeof(saddr));
   Listen(listenfd, 5);
+  Signal(SIGCHLD, sig_chld);
 
   // printf("listening on %d port\n", ntohs(saddr.sin_port));
 

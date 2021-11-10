@@ -136,7 +136,7 @@ Signal(int signo, Sigfunc *func) {
 #endif
   } else {
 #ifdef SA_RESTART
-    act.sa_flags |= SA_RESTART;
+    act.sa_flags |= SA_RESTART; /* interrupted calls must restart */
 #endif
   }
   if (sigaction(signo, &act, &oldact) < 0) {
