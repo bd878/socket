@@ -7,9 +7,12 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
+#include <signal.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+typedef void Sigfunc(int);
 
 int Socket(int, int, int);
 void Bind(int, const struct sockaddr *, size_t);
@@ -23,5 +26,6 @@ ssize_t Readline(int, void *, size_t);
 char *Fgets(char *, int, FILE *);
 void Fputs(const char *, FILE *);
 void Inet_pton(int, const char *, void *);
+Sigfunc *Signal(int, Sigfunc *);
 
 #endif

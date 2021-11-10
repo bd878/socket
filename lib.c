@@ -122,3 +122,25 @@ Fputs(const char *str, FILE *stream) {
     exit(1);
   }
 }
+
+Sigfunc *
+Signal(int signo, Sigfunc *func) {
+  struct sigaction act, oldact;
+
+  act.sa_handler = func;
+  sigemptyset(&act.sa_mask);
+  act.sa_flags = 0;
+  if (signo == SIGALRM) { /* interrupted io operations must die */
+#ifdef SA_INTERRUPT
+    act.sa_flags |= SA_INTERRUPT;
+#endif
+  } else {
+#ifdef SA_RESTART
+    act.sa_flags |= SA_RESTART;
+#endif
+  }
+  if (sigaction(signo, &act, &oldact) < 0) {
+    return SIG_ERR;
+  }
+  return oldact.sa_handler;
+}

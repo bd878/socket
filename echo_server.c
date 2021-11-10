@@ -11,7 +11,7 @@ str_echo(int fd) {
       return;
     }
 
-    printf("received: %s\n", buf);
+    // printf("received: %s\n", buf);
 
     Writen(fd, buf, n);
   }
@@ -34,13 +34,13 @@ main(int argc, char **argv) {
   Bind(listenfd, (struct sockaddr *)&saddr, sizeof(saddr));
   Listen(listenfd, 5);
 
-  printf("listening on %d port\n", ntohs(saddr.sin_port));
+  // printf("listening on %d port\n", ntohs(saddr.sin_port));
 
   while (1) {
     clen = sizeof(caddr);
-    printf("waiting for connections...\n");
+    // printf("waiting for connections...\n");
     cfd = Accept(listenfd, (struct sockaddr *)&caddr, &clen);
-    printf("connection received on %d port\n", ntohs(caddr.sin_port));
+    // printf("connection received on %d port\n", ntohs(caddr.sin_port));
 
     if ((childpid = Fork()) == 0) {
       Close(listenfd);
