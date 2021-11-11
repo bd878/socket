@@ -17,13 +17,16 @@ str_echo(int fd) {
   }
 }
 
+/* ps -t pts/N -o pid,ppid,tty,stat,args,wchan */
 void
 sig_chld(int signo) {
   pid_t pid;
   int stat;
 
-  pid = wait(&stat);
-  printf("child terminated %d\n", pid);
+  while ((pid = waitpid(-1, &stat, WNOHANG)) > 0) {
+    printf("child terminated %d\n", pid);
+  }
+  return;
 }
 
 int
@@ -49,8 +52,15 @@ main(int argc, char **argv) {
   while (1) {
     clen = sizeof(caddr);
     // printf("waiting for connections...\n");
-    cfd = Accept(listenfd, (struct sockaddr *)&caddr, &clen);
-    // printf("connection received on %d port\n", ntohs(caddr.sin_port));
+    if ((cfd = accept(listenfd, (struct sockaddr *)&caddr, &clen)) < 0) {
+      if (errno = EINTR) {
+        continue; /* slow accept(...) interrupted by sys call */
+      } else {
+        perror("accept");
+        exit(1);
+      }
+    }
+    printf("connection received on %d port\n", ntohs(caddr.sin_port));
 
     if ((childpid = Fork()) == 0) {
       Close(listenfd);
