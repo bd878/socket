@@ -15,6 +15,17 @@ str_echo(int fd) {
   }
 }
 
+void
+sig_chld(int signo) {
+  int status;
+  pid_t p;
+
+  while ((p = waitpid(-1, &status, WNOHANG)) != -1) {
+    printf("child %d terminated\n", p);
+  }
+  return;
+}
+
 int main() {
   struct sockaddr_in addr, caddr;
   int sockfd, cfd;
@@ -30,6 +41,7 @@ int main() {
 
   Bind(sockfd, (struct sockaddr *)&addr, sizeof(addr));
   Listen(sockfd, 5);
+  Signal(SIGCHLD, sig_chld);
 
   while (1) {
     clen = sizeof(caddr);
