@@ -27,6 +27,7 @@ ssize_t Readline(int, void *, size_t);
 char *Fgets(char *, int, FILE *);
 void Fputs(const char *, FILE *);
 FILE *Fopen(const char *, const char *);
+FILE *Fdopen(int fd, const char *);
 FILE *Freopen(const char *, const char *, FILE *);
 void Inet_pton(int, const char *, void *);
 Sigfunc *Signal(int, Sigfunc *);

@@ -1,17 +1,17 @@
 #include "../lib.h"
 
 void
-str_echo(int fd) {
-  static const int MAXLINE = 1024;
+str_echo(FILE *fs) {
+  static const int MAXLINE = 2;
   char line[MAXLINE];
   ssize_t n;
 
   while (1) {
-    if ((n = read(fd, line, MAXLINE)) == 0) {
+    if ((n = fread(line, sizeof(char), MAXLINE, fs)) <= 0) {
       return;
     }
 
-    Writen(fd, line, n);
+    fwrite(line, sizeof(char), n, fs);
   }
 }
 
@@ -49,7 +49,8 @@ int main() {
 
     if ((childpid = Fork()) == 0) {
       Close(sockfd);
-      str_echo(cfd);
+      FILE *fs = Fdopen(cfd, "r");
+      str_echo(fs);
       exit(0);
     }
 

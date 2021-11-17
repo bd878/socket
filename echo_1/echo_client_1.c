@@ -2,11 +2,11 @@
 
 void
 str_cli(FILE *fs, int sockfd) {
-  static const int MAXLINE = 1024;
+  static const int MAXLINE = 2;
   char line[MAXLINE];
   ssize_t n;
 
-  while (Fgets(line, MAXLINE, fs) != NULL) {
+  while (fread(line, sizeof(char), MAXLINE, fs) > 0) {
     Writen(sockfd, line, strlen(line));
 
     memset(line, 0, sizeof(line));
@@ -34,7 +34,7 @@ int main(int argc, char **argv) {
   Inet_pton(AF_INET, argv[1], &addr.sin_addr);
 
   Connect(sockfd, (struct sockaddr *)&addr, sizeof(addr));
-  FILE *fs = Freopen("test.bin", "r", stdin);
+  FILE *fs = Fopen("test.bin", "r");
 
   str_cli(fs, sockfd);
 

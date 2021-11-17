@@ -147,6 +147,18 @@ Freopen(const char *pathname, const char *mode, FILE *stream) {
   return fs;
 }
 
+FILE *
+Fdopen(int fd, const char *mode) {
+  FILE *fs;
+
+  if ((fs = fdopen(fd, mode)) == NULL) {
+    perror("fdopen");
+    exit(1);
+  }
+
+  return fs;
+}
+
 Sigfunc *
 Signal(int signo, Sigfunc *func) {
   struct sigaction act, oldact;
