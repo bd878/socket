@@ -123,6 +123,30 @@ Fputs(const char *str, FILE *stream) {
   }
 }
 
+FILE *
+Fopen(const char *pathname, const char *mode) {
+  FILE *fs;
+
+  if ((fs = fopen(pathname, mode)) == NULL) {
+    perror("fopen");
+    exit(1);
+  }
+
+  return fs;
+}
+
+FILE *
+Freopen(const char *pathname, const char *mode, FILE *stream) {
+  FILE *fs;
+
+  if ((fs = freopen(pathname, mode, stream)) == NULL) {
+    perror("freopen");
+    exit(1);
+  }
+
+  return fs;
+}
+
 Sigfunc *
 Signal(int signo, Sigfunc *func) {
   struct sigaction act, oldact;

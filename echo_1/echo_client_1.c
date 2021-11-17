@@ -34,8 +34,9 @@ int main(int argc, char **argv) {
   Inet_pton(AF_INET, argv[1], &addr.sin_addr);
 
   Connect(sockfd, (struct sockaddr *)&addr, sizeof(addr));
+  FILE *fs = Freopen("test.bin", "r", stdin);
 
-  str_cli(stdin, sockfd);
+  str_cli(fs, sockfd);
 
   exit(0);
 };

@@ -1,8 +1,8 @@
-client.out : echo_client_1.o lib.o readline.o
-	gcc -o client echo_client_1.o lib.o readline.o
+client : echo_client_1.o lib.o readline.o
+	gcc -o client.out echo_client_1.o lib.o readline.o
 
-server.out : echo_server_1.o lib.o
-	gcc -o server echo_server_1.o lib.o
+server : echo_server_1.o lib.o
+	gcc -o server.out echo_server_1.o lib.o
 
 readline.o : ../readline.c ../lib.h
 	gcc -c ../readline.c
