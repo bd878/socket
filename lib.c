@@ -180,3 +180,37 @@ Signal(int signo, Sigfunc *func) {
   }
   return oldact.sa_handler;
 }
+
+void
+Setfl(int fd, int flags) {
+  int val;
+
+  if ((val = fcntl(fd, F_GETFL)) < 0) {
+    perror("fcntl");
+    exit(1);
+  }
+
+  val |= flags;
+
+  if (fcntl(fd, F_SETFL, val) < 0) {
+    perror("fcntl");
+    exit(1);
+  }
+}
+
+void
+Clrfl(int fd, int flags) {
+  int val;
+
+  if ((val = fcntl(fd, F_GETFL)) < 0) {
+    perror("fcntl");
+    exit(1);
+  }
+
+  val &= ~flags;
+
+  if (fcntl(fd, F_SETFL, val) < 0) {
+    perror("fcntl");
+    exit(1);
+  }
+}

@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <wait.h>
+#include <fcntl.h>
 
 typedef void Sigfunc(int);
 
@@ -31,5 +32,7 @@ FILE *Fdopen(int fd, const char *);
 FILE *Freopen(const char *, const char *, FILE *);
 void Inet_pton(int, const char *, void *);
 Sigfunc *Signal(int, Sigfunc *);
+void Setfl(int fd, int flags);
+void Clrfl(int fd, int flags);
 
 #endif
