@@ -19,6 +19,31 @@ str_echo(int fd) {
   }
 }
 
+struct args {
+  long arg1;
+  long arg2;
+};
+
+struct result {
+  long sum;
+};
+
+void
+str_echo_binary(int fd) {
+  struct result result;
+  struct args args;
+
+  while (1) {
+    if (Readn(fd, &args, sizeof(args)) == 0) {
+      printf("EOF reached\n");
+      exit(0);
+    }
+
+    result.sum = args.arg1 + args.arg2;
+    Writen(fd, &result, sizeof(result));
+  }
+}
+
 void
 sig_chld(int signo) {
   int status;
@@ -53,7 +78,7 @@ int main() {
 
     if ((childpid = Fork()) == 0) {
       Close(sockfd);
-      str_echo(cfd);
+      str_echo_binary(cfd);
       exit(0);
     }
 

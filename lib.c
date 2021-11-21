@@ -84,8 +84,7 @@ writen(int fd, const void *line, size_t n) {
   while (nleft > 0) {
     if ((nwritten = write(fd, vptr, n)) <= 0) {
       if (nwritten == -1 && errno == EINTR) { /* a signal interrupted write call */
-        nwritten = 0;
-        continue; /* try again */
+        nwritten = 0; /* try again */
       } else {
         return -1;
       }
@@ -213,4 +212,41 @@ Clrfl(int fd, int flags) {
     perror("fcntl");
     exit(1);
   }
+}
+
+ssize_t
+readn(int fd, void *vptr, size_t nbytes) {
+  char *ptr;
+  size_t nleft;
+  ssize_t n;
+
+  ptr = vptr;
+  nleft = nbytes;
+  while (nleft > 0) {
+    n = read(fd, ptr, nleft);
+    if (n == -1) {
+      if (errno == EINTR) {
+        n = 0;
+      } else {
+        return -1;
+      }
+    } else if (n == 0) {
+      break; /* EOF reached */
+    }
+
+    ptr += n;
+    nleft -= n;
+  }
+  return (n - nleft);
+}
+
+ssize_t
+Readn(int fd, void *buf, size_t nbytes) {
+  ssize_t n;
+
+  if ((n = readn(fd, buf, nbytes)) < 0) {
+    perror("readn");
+    exit(1);
+  }
+  return n;
 }

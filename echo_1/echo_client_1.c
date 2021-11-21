@@ -31,6 +31,38 @@ str_cli(int sockfd) {
   }
 }
 
+struct args {
+  long arg1;
+  long arg2;
+};
+
+struct result {
+  long sum;
+};
+
+void
+str_cli_binary(int sockfd) {
+  static const int MAXLINE = 1024;
+  char line[MAXLINE];
+  struct args args;
+  struct result result;
+
+  while (Fgets(line, MAXLINE, stdin) != NULL) {
+    if (sscanf(line, "%ld%ld", &args.arg1, &args.arg2) != 2) {
+      printf("invalid argument %s\n", line);
+      continue;
+    }
+
+    Writen(sockfd, &args, sizeof(args));
+    if (Readn(sockfd, &result, sizeof(result)) == 0) {
+      printf("failed to get result\n");
+      exit(1);
+    }
+
+    printf("%ld\n", result.sum);
+  }
+}
+
 int main(int argc, char **argv) {
   struct sockaddr_in addr;
   int sockfd;
@@ -48,7 +80,7 @@ int main(int argc, char **argv) {
 
   Connect(sockfd, (struct sockaddr *)&addr, sizeof(addr));
 
-  str_cli(sockfd);
+  str_cli_binary(sockfd);
 
   exit(0);
 };
