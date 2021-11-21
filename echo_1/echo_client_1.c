@@ -1,27 +1,28 @@
 #include "../lib.h"
 
 void
-str_cli(int fd, int sockfd) {
+str_cli(int sockfd) {
   static const int MAXLINE = 1024;
   char line[MAXLINE];
   ssize_t nbackreaden;
   size_t nreaden;
   ssize_t nwritten;
+  FILE *sockfile = fdopen(sockfd, "a+");
 
   errno = 0;
-  while ((nreaden = read(fd, line, MAXLINE)) > 0) {
-    fprintf(stderr, "chars readen %ld, strlen readen line %ld\n", nreaden, strlen(line));
-    nwritten = write(sockfd, line, strlen(line));
-    fprintf(stderr, "chars written to fd %ld\n", nwritten);
+  while ((nreaden = fread(line, 1, MAXLINE, stdin)) > 0) {
+    fprintf(stderr, "bytes readen %ld\n", nreaden);
+    nwritten = fwrite(line, 1, nreaden, sockfile);
+    fprintf(stderr, "bytes written to fd %ld\n", nwritten);
 
     memset(line, 0, MAXLINE);
-    if ((nbackreaden = read(sockfd, line, MAXLINE)) == 0) {
+    if ((nbackreaden = fread(line, 1, MAXLINE, sockfile)) == 0) {
       printf("EOF reached\n");
       exit(0); /* EOF reached */
     };
-    fprintf(stderr, "back readen %ld, line size is %ld\n", nbackreaden, strlen(line));
+    fprintf(stderr, "bytes readen back %ld\n", nbackreaden);
 
-    Fputs(line, stdout);
+    fwrite(line, 1, nbackreaden, stdout);
     memset(line, 0, MAXLINE);
   }
 
@@ -47,7 +48,7 @@ int main(int argc, char **argv) {
 
   Connect(sockfd, (struct sockaddr *)&addr, sizeof(addr));
 
-  str_cli(STDIN_FILENO, sockfd);
+  str_cli(sockfd);
 
   exit(0);
 };

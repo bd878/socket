@@ -5,14 +5,16 @@ str_echo(int fd) {
   static const int MAXLINE = 1024;
   char line[MAXLINE];
   ssize_t n;
+  FILE *clifile = fdopen(fd, "a+");
 
   while (1) {
-    if ((n = read(fd, line, MAXLINE)) <= 0) {
-      return;
+    n = read(fd, line, MAXLINE);
+    if (n <= 0) {
+      exit(0);
     }
-    fprintf(stdout, "chars readen %ld, line %s\n", n, line);
+    fprintf(stdout, "chars readen %ld in line %s\n", n, line);
 
-    write(fd, line, n);
+    fwrite(line, 1, n, clifile);
     memset(line, 0, MAXLINE);
   }
 }
