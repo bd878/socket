@@ -4,17 +4,13 @@ void
 str_echo(int fd) {
   static const int MAXLINE = 1024;
   char line[MAXLINE];
-  ssize_t n;
-  FILE *clifile = fdopen(fd, "a+");
 
   while (1) {
-    n = read(fd, line, MAXLINE);
-    if (n <= 0) {
+    if (Readline(fd, line, MAXLINE) < 0) {
       exit(0);
     }
-    fprintf(stdout, "chars readen %ld in line %s\n", n, line);
 
-    fwrite(line, 1, n, clifile);
+    Writen(fd, line, strlen(line));
     memset(line, 0, MAXLINE);
   }
 }
@@ -74,11 +70,18 @@ int main() {
 
   while (1) {
     clen = sizeof(caddr);
-    cfd = Accept(sockfd, (struct sockaddr *)&caddr, &clen);
+    if ((cfd = accept(sockfd, (struct sockaddr *)&caddr, &clen)) < 0) {
+      if (errno == EINTR) {
+        continue;
+      } else {
+        perror("accept");
+        exit(1);
+      }
+    }
 
     if ((childpid = Fork()) == 0) {
       Close(sockfd);
-      str_echo_binary(cfd);
+      str_echo(cfd);
       exit(0);
     }
 

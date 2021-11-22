@@ -4,25 +4,19 @@ void
 str_cli(int sockfd) {
   static const int MAXLINE = 1024;
   char line[MAXLINE];
-  ssize_t nbackreaden;
-  size_t nreaden;
   ssize_t nwritten;
-  FILE *sockfile = fdopen(sockfd, "a+");
 
   errno = 0;
-  while ((nreaden = fread(line, 1, MAXLINE, stdin)) > 0) {
-    fprintf(stderr, "bytes readen %ld\n", nreaden);
-    nwritten = fwrite(line, 1, nreaden, sockfile);
-    fprintf(stderr, "bytes written to fd %ld\n", nwritten);
+  while (Fgets(line, MAXLINE, stdin) != NULL) {
+    Writen(sockfd, line, strlen(line));
 
     memset(line, 0, MAXLINE);
-    if ((nbackreaden = fread(line, 1, MAXLINE, sockfile)) == 0) {
+    if (Readline(sockfd, line, MAXLINE) <= 0) {
       printf("EOF reached\n");
       exit(0); /* EOF reached */
     };
-    fprintf(stderr, "bytes readen back %ld\n", nbackreaden);
 
-    fwrite(line, 1, nbackreaden, stdout);
+    Fputs(line, stdout);
     memset(line, 0, MAXLINE);
   }
 
@@ -80,7 +74,7 @@ int main(int argc, char **argv) {
 
   Connect(sockfd, (struct sockaddr *)&addr, sizeof(addr));
 
-  str_cli_binary(sockfd);
+  str_cli(sockfd);
 
   exit(0);
 };
