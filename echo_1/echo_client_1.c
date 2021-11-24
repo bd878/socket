@@ -1,6 +1,12 @@
 #include "../lib.h"
 
 void
+sig_pipe(int signo) {
+  printf("sigpipe raised\n");
+  return;
+}
+
+void
 str_cli(int sockfd) {
   static const int MAXLINE = 1024;
   char line[MAXLINE];
@@ -8,7 +14,10 @@ str_cli(int sockfd) {
 
   errno = 0;
   while (Fgets(line, MAXLINE, stdin) != NULL) {
-    Writen(sockfd, line, strlen(line));
+    Writen(sockfd, line, 1);
+    sleep(1);
+    Writen(sockfd, line + 1, strlen(line) - 1);
+
 
     memset(line, 0, MAXLINE);
     if (Readline(sockfd, line, MAXLINE) <= 0) {
@@ -73,6 +82,7 @@ int main(int argc, char **argv) {
   Inet_pton(AF_INET, argv[1], &addr.sin_addr);
 
   Connect(sockfd, (struct sockaddr *)&addr, sizeof(addr));
+  Signal(SIGPIPE, sig_pipe);
 
   str_cli(sockfd);
 
