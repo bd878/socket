@@ -260,3 +260,33 @@ Select(int maxfdp, fd_set *rset, fd_set *wset, fd_set *errset, struct timeval *t
   }
   return n;
 }
+
+ssize_t
+Read(int fd, void *buf, size_t count) {
+  ssize_t n;
+
+  if ((n = read(fd, buf, count)) == -1) {
+    perror("read");
+    exit(1);
+  }
+  return n;
+}
+
+void
+Shutdown(int fd, int how) {
+  if (shutdown(fd, how) == -1) {
+    perror("shutdown");
+    exit(1);
+  }
+}
+
+ssize_t
+Write(int fd, const void *buf, size_t ncount) {
+  ssize_t n;
+
+  if ((n = write(fd, buf, ncount)) == -1) {
+    perror("write");
+    exit(1);
+  }
+  return n;
+}

@@ -37,9 +37,12 @@ FILE *Fdopen(int, const char *);
 FILE *Freopen(const char *, const char *, FILE *);
 void Inet_pton(int, const char *, void *);
 Sigfunc *Signal(int, Sigfunc *);
-void Setfl(int fd, int flags);
-void Clrfl(int fd, int flags);
+void Setfl(int fd, int);
+void Clrfl(int fd, int);
 ssize_t Readn(int, void *, size_t);
+ssize_t Read(int, void *, size_t);
 int Select(int, fd_set *, fd_set *, fd_set *, struct timeval *);
+void Shutdown(int, int);
+ssize_t Write(int, const void *, size_t);
 
 #endif

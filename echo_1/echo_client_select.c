@@ -38,6 +38,51 @@ str_cli(FILE *fp, int fd) {
   }
 }
 
+void
+str_cli_shutdown(FILE *fp, int fd) {
+  static const int MAXLINE = 1024;
+  int maxfdp1, fpeof, allsend;
+  fd_set rset;
+  char buf[MAXLINE];
+  int n;
+
+  FD_ZERO(&rset);
+
+  fpeof = 0;
+  allsend = 0;
+  while (allsend == 0) {
+    if (fpeof == 0) {
+      FD_SET(fileno(fp), &rset);
+    }
+    FD_SET(fd, &rset);
+    maxfdp1 = max(fileno(fp), fd) + 1;
+    Select(maxfdp1, &rset, NULL, NULL, NULL);
+
+    if (FD_ISSET(fd, &rset)) {
+      if ((n = Read(fd, buf, MAXLINE)) == 0) {
+        if (fpeof == 1) {
+          allsend = 1;
+        } else {
+          printf("std_cli_shutdown: server terminated prematurely\n");
+          exit(1);
+        }
+      } else {
+        Writen(fileno(stdout), buf, n);
+      }
+    }
+
+    if (FD_ISSET(fileno(fp), &rset)) {
+      if ((n = Read(fileno(fp), buf, MAXLINE)) == 0) {
+        fpeof = 1;
+        Shutdown(fd, SHUT_WR);
+        FD_CLR(fileno(fp), &rset);
+      } else {
+        Writen(fd, buf, n);
+      }
+    }
+  }
+}
+
 int main(int argc, char **argv) {
   struct sockaddr_in addr;
   int sockfd;
@@ -55,7 +100,8 @@ int main(int argc, char **argv) {
 
   Connect(sockfd, (struct sockaddr *)&addr, sizeof(addr));
 
-  str_cli(stdin, sockfd);
+  str_cli_shutdown(stdin, sockfd);
+  // str_cli(stdin, sockfd);
 
   exit(0);
 }
