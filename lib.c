@@ -250,3 +250,13 @@ Readn(int fd, void *buf, size_t nbytes) {
   }
   return n;
 }
+
+int
+Select(int maxfdp, fd_set *rset, fd_set *wset, fd_set *errset, struct timeval *timeout) {
+  int n;
+  if ((n = select(maxfdp, rset, wset, errset, timeout)) < 0) {
+    perror("select");
+    exit(1);
+  }
+  return n;
+}

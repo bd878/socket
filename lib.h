@@ -12,7 +12,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <wait.h>
+#include <sys/select.h>
+#include <sys/time.h>
 #include <fcntl.h>
+
+#define min(a, b) ((a) < (b) ? (a) : (b))
+#define max(a, b) ((a) > (b) ? (a) : (b))
 
 typedef void Sigfunc(int);
 
@@ -35,5 +40,6 @@ Sigfunc *Signal(int, Sigfunc *);
 void Setfl(int fd, int flags);
 void Clrfl(int fd, int flags);
 ssize_t Readn(int, void *, size_t);
+int Select(int, fd_set *, fd_set *, fd_set *, struct timeval *);
 
 #endif
