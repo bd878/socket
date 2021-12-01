@@ -24,6 +24,10 @@
 #define INFTIM -1
 #endif
 
+#ifndef INET_ADDRSTRLEN
+#define INET_ADDRSTRLEN 16
+#endif
+
 typedef void Sigfunc(int);
 
 int Socket(int, int, int);
