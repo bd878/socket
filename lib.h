@@ -13,11 +13,16 @@
 #include <stdlib.h>
 #include <wait.h>
 #include <sys/select.h>
+#include <poll.h>
 #include <sys/time.h>
 #include <fcntl.h>
 
 #define min(a, b) ((a) < (b) ? (a) : (b))
 #define max(a, b) ((a) > (b) ? (a) : (b))
+
+#ifndef INFTIM
+#define INFTIM -1
+#endif
 
 typedef void Sigfunc(int);
 
@@ -42,6 +47,7 @@ void Clrfl(int fd, int);
 ssize_t Readn(int, void *, size_t);
 ssize_t Read(int, void *, size_t);
 int Select(int, fd_set *, fd_set *, fd_set *, struct timeval *);
+int Poll(struct pollfd *, unsigned long, int);
 void Shutdown(int, int);
 ssize_t Write(int, const void *, size_t);
 

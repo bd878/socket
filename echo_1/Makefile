@@ -10,6 +10,9 @@ client_select : echo_client_select.o lib.o readline.o
 server_select : echo_server_select.o lib.o
 	gcc -o server_select.out echo_server_select.o lib.o
 
+server_poll : echo_server_poll.o lib.o
+	gcc -o server_poll.out echo_server_poll.o lib.o
+
 readline.o : ../readline.c ../lib.h
 	gcc -c ../readline.c
 
@@ -21,6 +24,9 @@ echo_client_select.o : echo_client_select.c ../lib.h
 
 echo_server_select.o : echo_server_select.c ../lib.h
 	gcc -c ./echo_server_select.c
+
+echo_server_poll.o : echo_server_poll.c ../lib.h
+	gcc -c ./echo_server_poll.c
 
 lib.o : ../lib.c ../lib.h
 	gcc -c ../lib.c

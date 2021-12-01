@@ -261,13 +261,23 @@ Select(int maxfdp, fd_set *rset, fd_set *wset, fd_set *errset, struct timeval *t
   return n;
 }
 
+int
+Poll(struct pollfd *fdarray, unsigned long nfds, int timeout) {
+  int n;
+
+  if ((n = poll(fdarray, nfds, timeout)) < 0) {
+    perror("poll");
+    exit(1);
+  }
+  return n;
+}
+
 ssize_t
 Read(int fd, void *buf, size_t count) {
   ssize_t n;
 
   if ((n = read(fd, buf, count)) == -1) {
     perror("read");
-    exit(1);
   }
   return n;
 }
