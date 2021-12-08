@@ -100,8 +100,8 @@ int main(int argc, char **argv) {
 
   Connect(sockfd, (struct sockaddr *)&addr, sizeof(addr));
 
-  str_cli_shutdown(stdin, sockfd);
-  // str_cli(stdin, sockfd);
+  // str_cli_shutdown(stdin, sockfd);
+  str_cli(stdin, sockfd);
 
   exit(0);
 }

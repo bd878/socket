@@ -34,13 +34,14 @@ int main(int argc, char **argv) {
   ling.l_onoff = 1;
   ling.l_linger = 0;
   setsockopt(sockfd, SOL_SOCKET, SO_LINGER, &ling, sizeof(ling));
+  Close(sockfd);
 
-  if ((nwritten = write(sockfd, str, strlen(str))) < 0) {
-    printf("failed to write %s: %s\n", str, strerror(errno));
-    exit(1);
-  }
+  // if ((nwritten = write(sockfd, str, strlen(str))) < 0) {
+  //   printf("failed to write %s: %s\n", str, strerror(errno));
+  //   exit(1);
+  // }
 
-  printf("%ld bytes written to socked\n", nwritten);
-  close(sockfd);
+  // printf("%ld bytes written to socked\n", nwritten);
+  // close(sockfd);
   exit(0);
 }

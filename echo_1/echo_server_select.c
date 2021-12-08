@@ -36,8 +36,11 @@ int main() {
     rset = allset;
     dnready = Select(maxfd + 1, &rset, NULL, NULL, NULL);
 
+    printf("connection received\n");
     if (FD_ISSET(listenfd, &rset)) {
       clilen = sizeof(cliaddr);
+      printf("listening socket readable\n");
+      sleep(5);
       clifd = Accept(listenfd, (struct sockaddr *)&cliaddr, &clilen);
 
       for (int i = 0, isplaced = 0; i < FD_SETSIZE && isplaced == 0; ++i) {
@@ -58,7 +61,9 @@ int main() {
     for (int i = 0; i <= maxi && dnready > 0; ++i) {
       if (clients[i] > 0) {
         if (FD_ISSET(clients[i], &rset)) {
-          if ((nread = Read(clients[i], readbuf, MAXLINE)) == 0) {
+          if ((nread = Read(clients[i], readbuf, MAXLINE)) < 0) {
+            printf("RST\n");
+          } else if (nread == 0) {
             Close(clients[i]);
             FD_CLR(clients[i], &allset);
             clients[i] = -1;
