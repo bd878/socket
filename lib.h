@@ -54,5 +54,6 @@ int Select(int, fd_set *, fd_set *, fd_set *, struct timeval *);
 int Poll(struct pollfd *, unsigned long, int);
 void Shutdown(int, int);
 ssize_t Write(int, const void *, size_t);
+long Sysconf(int);
 
 #endif

@@ -1,10 +1,13 @@
 #include "../lib.h"
 #include <limits.h>
 
+long get_open_max(void);
+
 int main() {
   const int SOCKFD_I = 0;
-  const int OPEN_MAX = 100;
   static const int MAXLINE = 1024;
+  const long OPEN_MAX = get_open_max();
+  printf("OPEN_MAX = %ld\n", OPEN_MAX);
   char buf[MAXLINE];
   struct sockaddr_in addr, caddr;
   int sockfd, clifd;
@@ -82,4 +85,15 @@ int main() {
       }
     }
   }
+}
+
+long
+get_open_max(void) {
+  static const int GUESS_OPEN_MAX = 100;
+
+  long result;
+  if ((result = Sysconf(_SC_OPEN_MAX)) == 0) {
+    result = GUESS_OPEN_MAX;
+  }
+  return result;
 }

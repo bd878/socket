@@ -300,3 +300,13 @@ Write(int fd, const void *buf, size_t ncount) {
   }
   return n;
 }
+
+long
+Sysconf(int name) {
+  long result = 0;
+  errno = 0;
+  if ((result = sysconf(name)) == -1 && errno != 0) {
+    perror("Sysconf");
+  }
+  return result;
+}
