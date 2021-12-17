@@ -1,6 +1,9 @@
 limits-static : limits.o
 	gcc -static -o ./limits.out ./limits.o
 
+sobuf : sobuf.o
+	gcc -o ./sobuf.out ./sobuf.o
+
 setnofile : setnofile.o
 	gcc -o ./setnofile.out ./setnofile.o
 
@@ -15,6 +18,9 @@ limits.o : limits.c
 
 setnofile.o : setnofile.c
 	gcc -c ./setnofile.c
+
+sobuf.o : sobuf.c
+	gcc -c ./sobuf.c
 
 clear :
 	rm -rf ./limits.out ./limits.o ./setnofile.out ./setnofile.o, ./nofile.o
