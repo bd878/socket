@@ -1,88 +1,30 @@
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <errno.h>
+#include "lib.h"
 
-int BUF_LEN = 1000;
-
-// 129.6.15.28
-// 128.138.140.44
 int
 main(int argc, char **argv) {
-  int sock, n;
-  char recvline[BUF_LEN + 1];
-  struct sockaddr_in serveaddr;
+  static const int MAXLINE = 1024;
 
-  if (argc != 2) {
-    perror("usage: a.out <IPaddress>");
+  struct sockaddr_in servaddr;
+  int fd, n;
+  char recvline[MAXLINE + 1];
+
+  if (argc < 2) {
+    perror("usage: daytimeclient.out <IPAddress>");
     exit(1);
   }
 
-  // if ((sock = socket(9999, SOCK_STREAM, 0)) < 0) {
-  //   perror("sock");
-  //   exit(1);
-  // }
+  fd = Socket(AF_INET, SOCK_STREAM, 0);
+  memset(&servaddr, 0, sizeof(servaddr));
+  servaddr.sin_family = AF_INET;
+  servaddr.sin_port = htons(80);
+  Inet_pton(AF_INET, argv[1], &servaddr.sin_addr);
 
-  if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-    perror("sock");
-    exit(1);
-  }
+  printf("...connecting\n");
 
-  memset(&serveaddr, 0, sizeof(serveaddr));
-  serveaddr.sin_family = AF_INET;
-  serveaddr.sin_port = htons(9999);
-  // serveaddr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
-  if (inet_pton(AF_INET, argv[1], &serveaddr.sin_addr) <= 0) {
-    printf("inet_pton error for %s\n", argv[1]);
-    exit(1);
-  }
-
-  printf("connecting...\n");
-  if (connect(sock, (struct sockaddr*)&serveaddr, sizeof(serveaddr)) > 0) {
-    // ECONNREFUSED, EINTR, ETIMEDOUT, rst handshake packet
-    perror("connect");
-    exit(2);
-  }
-
-  struct sockaddr_storage ss;
-  socklen_t len = sizeof(ss);
-  if (getsockname(sock, (struct sockaddr *)&ss, &len) == -1) {
-    perror("getsockname");
-    exit(4);
-  }
-
-  char buf[128];
-  printf("connected on %s:%d\n", /* sockaddr_storage -> sockaddr_in may be? */
-    inet_ntop(AF_INET, &((struct sockaddr_in *)&ss)->sin_addr, buf, sizeof(buf)),
-    ntohs(((struct sockaddr_in *)&ss)->sin_port));
-
-  // n = recv(sock, recvline, sizeof(BUF_LEN), 0);
-  // recvline[n] = 0;
-  // if (fputs(recvline, stdout) == EOF) {
-  //   perror("fputs error");
-  // }
-  int success_read_count = 0;
-  while ((n = read(sock, recvline, BUF_LEN)) > 0) {
-    success_read_count += 1;
-
+  Connect(fd, (struct sockaddr *)&servaddr, sizeof(servaddr));
+  while ((n = Read(fd, recvline, MAXLINE)) > 0) {
     recvline[n] = 0;
-    if (fputs(recvline, stdout) == EOF) {
-      printf("%s\n", strerror(errno));
-      exit(2);
-    }
-  }
-
-  printf("\n");
-  printf("Successive reads %d\n", success_read_count);
-
-  if (n < 0) {
-    perror("read");
-    exit(3);
+    Fputs(recvline, stdout);
   }
 
   return 0;
