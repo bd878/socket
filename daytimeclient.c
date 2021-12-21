@@ -16,7 +16,7 @@ main(int argc, char **argv) {
   fd = Socket(AF_INET, SOCK_STREAM, 0);
   memset(&servaddr, 0, sizeof(servaddr));
   servaddr.sin_family = AF_INET;
-  servaddr.sin_port = htons(80);
+  servaddr.sin_port = htons(5436);
   Inet_pton(AF_INET, argv[1], &servaddr.sin_addr);
 
   printf("...connecting\n");
