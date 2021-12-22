@@ -310,3 +310,10 @@ Sysconf(int name) {
   }
   return result;
 }
+
+void
+Getsockopt(int fd, int level, int optname, void *optval, socklen_t *optlenptr) {
+  if (getsockopt(fd, level, optname, optval, optlenptr) < 0) {
+    perror("getsockopt");
+  }
+}

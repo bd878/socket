@@ -55,5 +55,6 @@ int Poll(struct pollfd *, unsigned long, int);
 void Shutdown(int, int);
 ssize_t Write(int, const void *, size_t);
 long Sysconf(int);
+void Getsockopt(int fd, int level, int optname, void *optval, socklen_t *optlenptr);
 
 #endif
