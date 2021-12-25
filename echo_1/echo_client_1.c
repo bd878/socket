@@ -14,10 +14,7 @@ str_cli(int sockfd) {
 
   errno = 0;
   while (Fgets(line, MAXLINE, stdin) != NULL) {
-    Writen(sockfd, line, 1);
-    sleep(1);
-    Writen(sockfd, line + 1, strlen(line) - 1);
-
+    Writen(sockfd, line, strlen(line));
 
     memset(line, 0, MAXLINE);
     if (Readline(sockfd, line, MAXLINE) <= 0) {
@@ -66,8 +63,10 @@ str_cli_binary(int sockfd) {
   }
 }
 
-int main(int argc, char **argv) {
+int
+main(int argc, char **argv) {
   struct sockaddr_in addr;
+  struct linger ling;
   int sockfd;
 
   if (argc != 2) {
@@ -85,6 +84,10 @@ int main(int argc, char **argv) {
   Signal(SIGPIPE, sig_pipe);
 
   str_cli(sockfd);
+
+  ling.l_onoff = 1;
+  ling.l_linger = 0;
+  setsockopt(sockfd, SOL_SOCKET, SO_LINGER, &ling, sizeof(ling)); /* sudo ss -o4 state all dst 127.0.0.1:5436 */
 
   exit(0);
 };
